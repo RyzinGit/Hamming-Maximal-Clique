@@ -1,20 +1,101 @@
-// Hamming-Maximal-Clique.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <iostream>
+#include <set>
+#include <string>
+#include <vector>
+#include <chrono>
 
-int main()
+using namespace std;
+using namespace std::chrono;
+
+int hammingDist(string a, string b)
 {
-    std::cout << "Hello World!\n";
+    int len = 0;
+    for (int i = 0; i < a.size(); i++)
+    {
+        if (a[i] != b[i])
+        {
+            len++;
+        }
+    }
+    return len;
 }
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
+set<string> maxClique(int d, vector<string>& verts) {
+    set<string> clique;
 
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+    for (int i = 0; i < verts.size(); i++)
+    {
+        bool accept = true;
+
+        for (auto vertex : clique)
+        {
+            if (hammingDist(verts[i], vertex) < d) {
+                accept = false;
+                break;
+            }
+        }
+
+        if (accept == true)
+        {
+            clique.insert(verts[i]);
+        }
+    }
+
+    return clique;
+}
+
+void CliqueCalc(int first, int last) {
+
+    auto clockStart = high_resolution_clock::now();
+    vector<string> verts;
+
+    for (int i = 0; i < (1 << first); i++)
+    {
+        string v = "";
+
+        for (int j = 0; j < first; j++)
+        {
+
+            if (i & (1 << j))
+            {
+                v += '1';
+            }
+            else {
+                v += '0';
+            }
+
+        }
+        verts.push_back(v);
+    }
+
+    set<string> cliq = maxClique(last, verts);
+
+    auto clockEnd = high_resolution_clock::now();
+    auto time = duration_cast<microseconds>(clockEnd - clockStart);
+
+    cout << (time.count()) / (double)1000000 << " Sec\n" << endl;
+    cout << "Max clique: " << endl;
+
+    int countVertex = 0;
+    for (auto vertex : cliq) {
+        cout << vertex << " " << endl;
+        countVertex++;
+    }
+
+    cout << countVertex << " Vertex" << endl;
+}
+
+int main() {
+
+    int aCliqueN = 5;  //Example
+    int aCliqueD = 4;
+
+    int bCliqueN = 7;
+    int bCliqueD = 4;
+
+    CliqueCalc(aCliqueN, aCliqueD);
+    cout << "\n\n*************\n\n";
+    CliqueCalc(bCliqueN, bCliqueD);
+
+    return 0;
+}
